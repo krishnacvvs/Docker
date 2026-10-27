@@ -65,7 +65,7 @@ services:
       USER_PORT: 8080
       AMQP_HOST: rabbitmq
       AMQP_USER: roboshop
-      AMQAP_PASS: roboshop123 
+      AMQP_PASS: roboshop123 
     depends_on:
     - user
     - rabbitmq

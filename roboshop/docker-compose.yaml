@@ -20,6 +20,8 @@ services:
     - catalogue
     - user
     - cart
+    - shipping
+    - payment
   user:
     build: ./user
     image: user:v1
@@ -42,6 +44,32 @@ services:
     depends_on:
     - redis
     - catalogue
+  shipping:
+    build: ./shipping
+    image: shipping:v1
+    container_name: shipping
+    environment:     
+      CART_ENDPOINT: "cart:8080"
+      DB_HOST: mysql
+    depends_on:
+    - mysql
+    - cart
+  payment:
+    build: ./payment
+    image: payment:v1
+    container_name: payment
+    environment:     
+      CART_HOST: "cart"
+      CART_PORT: 8080
+      USER_HOST: user
+      USER_PORT: 8080
+      AMQP_HOST: rabbitmq
+      AMQP_USER: roboshop
+      AMQAP_PASS: roboshop123 
+    depends_on:
+    - user
+    - rabbitmq
+    - cart
   redis:
     image: redis:7
     container_name: redis
@@ -52,6 +80,12 @@ services:
     command: --mysql-native-password=ON --innodb-lock_wait_timeout=120
     environment: 
       MYSQL_ROOT_PASSWORD: "RoboShop@1"
+  rabbitmq:
+    image: rabbitmq:3
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: roboshop
+      RABBITMQ_DEFAULT_PASS: roboshop123       
 networks: 
   default: 
     name: roboshop
